@@ -1,3 +1,5 @@
+import math
+
 movies = [
     {
         "title": "The Dune Chronicles",
@@ -81,7 +83,40 @@ movies = [
     },
 ]
 
+
+def average_rating(movies):
+    if not movies:
+        return 0.0
+    total = 0.0
+    for movie in movies:
+        total += movie["rating"]
+    return round(total / len(movies), 1)
+
+
+def catalog_age_stats(movies, current_year=2026):
+    if not movies:
+        return (0, 0, 0)
+    ages = []
+    for movie in movies:
+        ages.append(current_year - movie["year"])
+    return (max(ages), min(ages), math.ceil(sum(ages) / len(ages)))
+
+
+def duration_in_hours(minutes):
+    hours = minutes // 60
+    remaining_minutes = minutes % 60
+    return f"{hours}ч {remaining_minutes}м"
+
+
 if __name__ == "__main__":
-    print("Количество фильмов:", len(movies))
-    print("Первый фильм:", movies[0]["title"])
-    print("Последний фильм:", movies[-1]["title"])
+    print("Средний рейтинг:", average_rating(movies))
+    print("Возраст фильмов:", catalog_age_stats(movies))
+    print("155 минут:", duration_in_hours(155))
+    assert average_rating(movies) == 7.2
+    assert catalog_age_stats(movies) == (15, 2, 8)
+    assert isinstance(catalog_age_stats(movies), tuple)
+    assert catalog_age_stats(movies, 2030) == (19, 6, 12)
+    assert duration_in_hours(0) == "0ч 0м"
+    assert duration_in_hours(60) == "1ч 0м"
+    assert duration_in_hours(155) == "2ч 35м"
+    print("Этап 1 проверен")
