@@ -157,16 +157,34 @@ def count_long_movies(movies, threshold=120):
     return count
 
 
+def normalize_title(title):
+    words = title.split()
+    normalized_words = []
+    for word in words:
+        normalized_words.append(word[0].upper() + word[1:])
+    return " ".join(normalized_words)
+
+
+def make_slug(title):
+    return normalize_title(title).lower().replace(" ", "-")
+
+
+def format_report_line(movie):
+    title = normalize_title(movie["title"])
+    duration = duration_in_hours(movie["duration_min"])
+    genres = ", ".join(sorted(movie["genres"]))
+    return (
+        f'"{title}" ({movie["year"]}) — {movie["rating"]:.1f}/10, '
+        f"{duration}, жанры: {genres}"
+    )
+
+
 if __name__ == "__main__":
-    print("Фильмы без жанра comedy:")
-    print_non_comedies(movies)
-    found = find_first_masterpiece(movies)
-    assert found["title"] == "The Quiet Algorithm"
-    print("Проверяем отсутствие рейтингов выше 9.0:")
-    assert find_first_masterpiece(movies[:7]) is None
-    boundary = [{"title": "Граница", "rating": 9.0}]
-    assert find_first_masterpiece(boundary) is None
-    assert find_first_masterpiece([]) is None
-    assert count_long_movies(movies) == 4
-    assert count_long_movies(movies, 124) == 3
-    print("Этап 3 проверен")
+    assert normalize_title("silent hours") == "Silent Hours"
+    assert normalize_title("  midnight   in oslo  ") == "Midnight In Oslo"
+    assert normalize_title("") == ""
+    assert make_slug("The Quiet Algorithm") == "the-quiet-algorithm"
+    expected = '"The Quiet Algorithm" (2024) — 9.2/10, 1ч 58м, жанры: drama, sci-fi'
+    assert format_report_line(movies[7]) == expected
+    print(format_report_line(movies[7]))
+    print("Этап 4 проверен")
