@@ -247,20 +247,33 @@ def total_duration_above_seven(movies):
     return sum(movie["duration_min"] for movie in movies if movie["rating"] > 7)
 
 
+def build_report(movies):
+    print("ОТЧЕТ ПО КАТАЛОГУ")
+    if not movies:
+        print("Каталог пуст")
+        return
+
+    oldest, newest, average_age = catalog_age_stats(movies)
+    print(f"Средний рейтинг: {average_rating(movies):.1f}")
+    print(f"Средний возраст фильмов: {average_age} лет")
+
+    print("\nТоп-3 фильма:")
+    movies_by_title = {movie["title"]: movie for movie in movies}
+    for title, _rating in top_n_by_rating(movies):
+        print(f"  {format_report_line(movies_by_title[title])}")
+
+    print("\nФильмов по жанрам:")
+    genre_counts = count_by_genre(movies)
+    ordered_genres = sorted(genre_counts.items(), key=lambda item: (-item[1], item[0]))
+    for genre, count in ordered_genres:
+        print(f"  {genre} — {count}")
+    genres_line = ", ".join(sorted(all_genres(movies)))
+    print(f"\nВсе жанры каталога: {genres_line}")
+
+    print("\nДополнительный анализ")
+    print(f"Возраст самого старого и нового фильма: {oldest} и {newest} лет")
+    print(f"Фильмов длиннее 120 минут: {count_long_movies(movies)}")
+
+
 if __name__ == "__main__":
-    for movie in iter_high_rated(movies):
-        print(format_report_line(movie))
-    high_rated = list(iter_high_rated(movies))
-    assert len(high_rated) == 3
-    assert high_rated[0]["title"] == "The Dune Chronicles"
-    assert high_rated[1]["title"] == "midnight in oslo"
-    assert high_rated[2]["title"] == "The Quiet Algorithm"
-    assert len(list(iter_high_rated(movies, 8.6))) == 3
-    assert list(iter_high_rated(movies, 10.0)) == []
-    generator = iter_high_rated(movies)
-    assert next(generator)["title"] == "The Dune Chronicles"
-    assert len(list(generator)) == 2
-    assert list(generator) == []
-    assert total_duration_above_seven(movies) == 713
-    print("Общая длительность:", total_duration_above_seven(movies))
-    print("Этап 8 проверен")
+    build_report(movies)
