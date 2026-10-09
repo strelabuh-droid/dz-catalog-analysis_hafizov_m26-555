@@ -108,15 +108,35 @@ def duration_in_hours(minutes):
     return f"{hours}ч {remaining_minutes}м"
 
 
+def rating_tier(rating):
+    if rating >= 9:
+        return "шедевр"
+    elif rating >= 7:
+        return "хорошо"
+    else:
+        return "средне" if rating >= 5 else "слабо"
+
+
+def decade_label(year):
+    match year:
+        case _ if year > 2020:
+            return "новые"
+        case _ if 2015 <= year <= 2020:
+            return "недавние"
+        case _:
+            return "старые"
+
+
 if __name__ == "__main__":
-    print("Средний рейтинг:", average_rating(movies))
-    print("Возраст фильмов:", catalog_age_stats(movies))
-    print("155 минут:", duration_in_hours(155))
-    assert average_rating(movies) == 7.2
-    assert catalog_age_stats(movies) == (15, 2, 8)
-    assert isinstance(catalog_age_stats(movies), tuple)
-    assert catalog_age_stats(movies, 2030) == (19, 6, 12)
-    assert duration_in_hours(0) == "0ч 0м"
-    assert duration_in_hours(60) == "1ч 0м"
-    assert duration_in_hours(155) == "2ч 35м"
-    print("Этап 1 проверен")
+    assert rating_tier(4.9) == "слабо"
+    assert rating_tier(5.0) == "средне"
+    assert rating_tier(6.9) == "средне"
+    assert rating_tier(7.0) == "хорошо"
+    assert rating_tier(8.9) == "хорошо"
+    assert rating_tier(8.95) == "хорошо"
+    assert rating_tier(9.0) == "шедевр"
+    assert decade_label(2014) == "старые"
+    assert decade_label(2015) == "недавние"
+    assert decade_label(2020) == "недавние"
+    assert decade_label(2021) == "новые"
+    print("Этап 2 проверен")
