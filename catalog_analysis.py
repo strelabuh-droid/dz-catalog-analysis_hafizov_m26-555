@@ -237,13 +237,30 @@ def genres_only_in_one(movies_a, movies_b):
     return all_genres(movies_a) - all_genres(movies_b)
 
 
+def iter_high_rated(movies, min_rating=8.0):
+    for movie in movies:
+        if movie["rating"] >= min_rating:
+            yield movie
+
+
+def total_duration_above_seven(movies):
+    return sum(movie["duration_min"] for movie in movies if movie["rating"] > 7)
+
+
 if __name__ == "__main__":
-    expected_genres = {"action", "comedy", "drama", "mystery", "sci-fi", "thriller"}
-    assert all_genres(movies) == expected_genres
-    assert isinstance(all_genres(movies), set)
-    assert all_genres([]) == set()
-    assert common_actors(movies[0], movies[3]) == {"O. Isaac"}
-    assert genres_only_in_one(movies[5:6], movies[:5]) == {"mystery"}
-    assert genres_only_in_one(movies, movies) == set()
-    print("Все жанры:", ", ".join(sorted(all_genres(movies))))
-    print("Этап 7 проверен")
+    for movie in iter_high_rated(movies):
+        print(format_report_line(movie))
+    high_rated = list(iter_high_rated(movies))
+    assert len(high_rated) == 3
+    assert high_rated[0]["title"] == "The Dune Chronicles"
+    assert high_rated[1]["title"] == "midnight in oslo"
+    assert high_rated[2]["title"] == "The Quiet Algorithm"
+    assert len(list(iter_high_rated(movies, 8.6))) == 3
+    assert list(iter_high_rated(movies, 10.0)) == []
+    generator = iter_high_rated(movies)
+    assert next(generator)["title"] == "The Dune Chronicles"
+    assert len(list(generator)) == 2
+    assert list(generator) == []
+    assert total_duration_above_seven(movies) == 713
+    print("Общая длительность:", total_duration_above_seven(movies))
+    print("Этап 8 проверен")
