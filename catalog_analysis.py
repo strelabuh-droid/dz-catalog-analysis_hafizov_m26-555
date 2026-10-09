@@ -197,20 +197,56 @@ def top_n_by_rating(movies, n=3):
     return top
 
 
+def count_by_genre(movies):
+    counts = {}
+    for movie in movies:
+        for genre in movie["genres"]:
+            counts[genre] = counts.get(genre, 0) + 1
+    return counts
+
+
+def actor_filmography(movies):
+    filmography = {}
+    for movie in movies:
+        for actor in movie["actors"]:
+            if actor not in filmography:
+                filmography[actor] = []
+            filmography[actor].append(movie["title"])
+    return filmography
+
+
+def above_average_ratings(movies):
+    average = average_rating(movies)
+    return {
+        movie["title"]: movie["rating"] for movie in movies if movie["rating"] > average
+    }
+
+
 if __name__ == "__main__":
-    before = movies.copy()
-    titles = titles_sorted_by_rating(movies)
-    assert titles[0] == "The Quiet Algorithm"
-    assert titles[-1] == "Garden of Static"
-    expected_top = [
-        ("The Quiet Algorithm", 9.2),
-        ("midnight in oslo", 8.9),
-        ("The Dune Chronicles", 8.6),
+    expected_counts = {
+        "drama": 5,
+        "sci-fi": 3,
+        "comedy": 3,
+        "thriller": 3,
+        "action": 2,
+        "mystery": 1,
+    }
+    assert count_by_genre(movies) == expected_counts
+    filmography = actor_filmography(movies)
+    assert filmography["A. Novak"] == [
+        "Kitchen Stories",
+        "The Last Bakery",
+        "Two Left Shoes",
     ]
-    assert top_n_by_rating(movies) == expected_top
-    assert isinstance(top_n_by_rating(movies)[0], tuple)
-    assert len(top_n_by_rating(movies, 100)) == 10
-    assert top_n_by_rating(movies, 0) == []
-    assert movies == before
-    print(top_n_by_rating(movies))
-    print("Этап 5 проверен")
+    assert len(filmography) == 8
+    assert "The Dune Chronicles" in filmography["R. Ferguson"]
+    assert "Kitchen Stories" in filmography["M. Ferguson"]
+    assert above_average_ratings(movies) == {
+        "The Dune Chronicles": 8.6,
+        "The Last Bakery": 7.8,
+        "midnight in oslo": 8.9,
+        "The Quiet Algorithm": 9.2,
+        "Red Harbor": 7.3,
+    }
+    print("Жанры:", count_by_genre(movies))
+    print("Этап 6 проверен")
