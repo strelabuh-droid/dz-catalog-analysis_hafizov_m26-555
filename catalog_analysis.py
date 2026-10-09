@@ -222,31 +222,28 @@ def above_average_ratings(movies):
     }
 
 
+def all_genres(movies):
+    genres = set()
+    for movie in movies:
+        genres.update(movie["genres"])
+    return genres
+
+
+def common_actors(movie1, movie2):
+    return set(movie1["actors"]) & set(movie2["actors"])
+
+
+def genres_only_in_one(movies_a, movies_b):
+    return all_genres(movies_a) - all_genres(movies_b)
+
+
 if __name__ == "__main__":
-    expected_counts = {
-        "drama": 5,
-        "sci-fi": 3,
-        "comedy": 3,
-        "thriller": 3,
-        "action": 2,
-        "mystery": 1,
-    }
-    assert count_by_genre(movies) == expected_counts
-    filmography = actor_filmography(movies)
-    assert filmography["A. Novak"] == [
-        "Kitchen Stories",
-        "The Last Bakery",
-        "Two Left Shoes",
-    ]
-    assert len(filmography) == 8
-    assert "The Dune Chronicles" in filmography["R. Ferguson"]
-    assert "Kitchen Stories" in filmography["M. Ferguson"]
-    assert above_average_ratings(movies) == {
-        "The Dune Chronicles": 8.6,
-        "The Last Bakery": 7.8,
-        "midnight in oslo": 8.9,
-        "The Quiet Algorithm": 9.2,
-        "Red Harbor": 7.3,
-    }
-    print("Жанры:", count_by_genre(movies))
-    print("Этап 6 проверен")
+    expected_genres = {"action", "comedy", "drama", "mystery", "sci-fi", "thriller"}
+    assert all_genres(movies) == expected_genres
+    assert isinstance(all_genres(movies), set)
+    assert all_genres([]) == set()
+    assert common_actors(movies[0], movies[3]) == {"O. Isaac"}
+    assert genres_only_in_one(movies[5:6], movies[:5]) == {"mystery"}
+    assert genres_only_in_one(movies, movies) == set()
+    print("Все жанры:", ", ".join(sorted(all_genres(movies))))
+    print("Этап 7 проверен")
