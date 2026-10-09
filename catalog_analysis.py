@@ -179,12 +179,38 @@ def format_report_line(movie):
     )
 
 
+def titles_sorted_by_rating(movies):
+    ordered_movies = sorted(movies, key=lambda movie: movie["rating"], reverse=True)
+    titles = []
+    for movie in ordered_movies:
+        titles.append(movie["title"])
+    return titles
+
+
+def top_n_by_rating(movies, n=3):
+    if n <= 0:
+        return []
+    ordered_movies = sorted(movies, key=lambda movie: movie["rating"], reverse=True)
+    top = []
+    for movie in ordered_movies[:n]:
+        top.append((movie["title"], movie["rating"]))
+    return top
+
+
 if __name__ == "__main__":
-    assert normalize_title("silent hours") == "Silent Hours"
-    assert normalize_title("  midnight   in oslo  ") == "Midnight In Oslo"
-    assert normalize_title("") == ""
-    assert make_slug("The Quiet Algorithm") == "the-quiet-algorithm"
-    expected = '"The Quiet Algorithm" (2024) — 9.2/10, 1ч 58м, жанры: drama, sci-fi'
-    assert format_report_line(movies[7]) == expected
-    print(format_report_line(movies[7]))
-    print("Этап 4 проверен")
+    before = movies.copy()
+    titles = titles_sorted_by_rating(movies)
+    assert titles[0] == "The Quiet Algorithm"
+    assert titles[-1] == "Garden of Static"
+    expected_top = [
+        ("The Quiet Algorithm", 9.2),
+        ("midnight in oslo", 8.9),
+        ("The Dune Chronicles", 8.6),
+    ]
+    assert top_n_by_rating(movies) == expected_top
+    assert isinstance(top_n_by_rating(movies)[0], tuple)
+    assert len(top_n_by_rating(movies, 100)) == 10
+    assert top_n_by_rating(movies, 0) == []
+    assert movies == before
+    print(top_n_by_rating(movies))
+    print("Этап 5 проверен")
