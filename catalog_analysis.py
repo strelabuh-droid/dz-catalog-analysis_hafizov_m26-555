@@ -127,16 +127,46 @@ def decade_label(year):
             return "старые"
 
 
+def print_non_comedies(movies):
+    for movie in movies:
+        if "comedy" in movie["genres"]:
+            continue
+        print(movie["title"])
+
+
+def find_first_masterpiece(movies):
+    index = 0
+    found = None
+    while index < len(movies):
+        movie = movies[index]
+        if movie["rating"] > 9.0:
+            found = movie
+            print(f"Первый фильм с рейтингом выше 9.0: {movie['title']}")
+            break
+        index += 1
+    else:
+        print("Шедевров не найдено")
+    return found
+
+
+def count_long_movies(movies, threshold=120):
+    count = 0
+    for movie in movies:
+        if movie["duration_min"] > threshold:
+            count += 1
+    return count
+
+
 if __name__ == "__main__":
-    assert rating_tier(4.9) == "слабо"
-    assert rating_tier(5.0) == "средне"
-    assert rating_tier(6.9) == "средне"
-    assert rating_tier(7.0) == "хорошо"
-    assert rating_tier(8.9) == "хорошо"
-    assert rating_tier(8.95) == "хорошо"
-    assert rating_tier(9.0) == "шедевр"
-    assert decade_label(2014) == "старые"
-    assert decade_label(2015) == "недавние"
-    assert decade_label(2020) == "недавние"
-    assert decade_label(2021) == "новые"
-    print("Этап 2 проверен")
+    print("Фильмы без жанра comedy:")
+    print_non_comedies(movies)
+    found = find_first_masterpiece(movies)
+    assert found["title"] == "The Quiet Algorithm"
+    print("Проверяем отсутствие рейтингов выше 9.0:")
+    assert find_first_masterpiece(movies[:7]) is None
+    boundary = [{"title": "Граница", "rating": 9.0}]
+    assert find_first_masterpiece(boundary) is None
+    assert find_first_masterpiece([]) is None
+    assert count_long_movies(movies) == 4
+    assert count_long_movies(movies, 124) == 3
+    print("Этап 3 проверен")
