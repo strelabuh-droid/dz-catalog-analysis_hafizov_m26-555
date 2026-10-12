@@ -273,6 +273,48 @@ def build_report(movies):
     print("\nДополнительный анализ")
     print(f"Возраст самого старого и нового фильма: {oldest} и {newest} лет")
     print(f"Фильмов длиннее 120 минут: {count_long_movies(movies)}")
+    print("\nКатегории и слаги:")
+    for movie in movies:
+        print(
+            f"  {normalize_title(movie['title'])}: "
+            f"{rating_tier(movie['rating'])}, {decade_label(movie['year'])}, "
+            f"слаг {make_slug(movie['title'])}"
+        )
+
+    print("\nВсе названия по убыванию рейтинга:")
+    for title in titles_sorted_by_rating(movies):
+        print(f"  {normalize_title(title)}")
+
+    print("\nФильмы без жанра comedy:")
+    print_non_comedies(movies)
+    print("\nПоиск первого фильма с рейтингом выше 9.0:")
+    find_first_masterpiece(movies)
+
+    print("\nФильмографии актеров:")
+    filmography = actor_filmography(movies)
+    for actor in sorted(filmography):
+        titles = []
+        for title in filmography[actor]:
+            titles.append(normalize_title(title))
+        print(f"  {actor}: {', '.join(titles)}")
+
+    print("\nФильмы с рейтингом выше среднего:")
+    for title, rating in above_average_ratings(movies).items():
+        print(f"  {normalize_title(title)} — {rating:.1f}")
+
+    if len(movies) >= 4:
+        actors_line = ", ".join(sorted(common_actors(movies[0], movies[3])))
+        print(f"\nОбщие актеры первого и четвертого фильма: {actors_line}")
+    if len(movies) >= 6:
+        unique_genres = genres_only_in_one(movies[5:6], movies[:5])
+        unique_genres_line = ", ".join(sorted(unique_genres))
+        print(f"Жанры шестого фильма вне первых пяти: {unique_genres_line}")
+
+    print("\nФильмы с рейтингом не ниже 8.0:")
+    for movie in iter_high_rated(movies):
+        print(f"  {format_report_line(movie)}")
+    total_minutes = total_duration_above_seven(movies)
+    print(f"\nДлительность фильмов с рейтингом выше 7: {total_minutes} минут")
 
 
 if __name__ == "__main__":
